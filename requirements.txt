@@ -1,0 +1,10 @@
+llama-index==0.9.8
+chardet-normalizer==3.1.0
+pypdf==3.16.1
+trulens-eval==0.21.0 
+sentence-transformers==2.2.2
+streamlit
+nltk
+openai
+nest_asyncio
+mistralai
