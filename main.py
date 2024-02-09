@@ -5,19 +5,20 @@ from llama_index import SimpleDirectoryReader, download_loader, Document
 from llama_index import ServiceContext, VectorStoreIndex, StorageContext, load_index_from_storage
 from llama_index.llms import OpenAI#, MistralAI
 #from llama_index.embeddings import MistralAIEmbedding
-from trulens_eval import Tru
+#from trulens_eval import Tru
 import streamlit as st
+"""
 from utils.sentence_window_retrieval import build_sentence_window_index, get_sentence_window_query_engine
 from utils.auto_merging_retrieval import build_automerging_index, get_automerging_query_engine
 from utils.trulens_utils import trulens_recorder, run_evals
-
+"""
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 notion_token = os.getenv('NOTION_INTEGRATION_TOKEN')
 #openai.api_key = st.secrets.OPENAI_API_KEY
 
 def load_documents():
-    #"""
+    """
     reader = SimpleDirectoryReader(
         input_files=["./db_docs/docs/eBook-How-to-Build-a-Career-in-AI.pdf"]
     )
@@ -29,7 +30,7 @@ def load_documents():
     documents = NotionPageReader(integration_token=notion_token).load_data(
         page_ids=page_ids
     )
-    """
+    #"""
     return documents
 
 def join_documents(documents):
