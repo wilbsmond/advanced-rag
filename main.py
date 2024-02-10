@@ -64,8 +64,13 @@ def load_data_to_index(_llm_model, mode):
         index = build_index(docs, _llm_model, mode)
         return index
 
+system_prompt = """
+                You are an expert on the Blendle's Employee Handbook and your job is to answer questions relating to its contents. 
+                Keep your answers based on facts – do not hallucinate features.
+                """
+
 if __name__ == "__main__":
-    llm_model = OpenAI(model="gpt-3.5-turbo", temperature=0.1)
+    llm_model = OpenAI(model="gpt-3.5-turbo", temperature=0.1, system_prompt=system_prompt)
     #llm = MistralAI(model="mistral-medium", api_key=os.getenv("MISTRAL_API_KEY"))
     #embed_model = "local:BAAI/bge-small-en-v1.5"
     #embed_model = MistralAIEmbedding(model_name="mistral-embed", api_key=os.getenv("MISTRAL_API_KEY"))
