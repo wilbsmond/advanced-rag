@@ -15,14 +15,14 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 notion_token = os.getenv('NOTION_INTEGRATION_TOKEN')
 
 @st.cache_resource(show_spinner=False)
-def load_data(_llm, embed_model):
+def load_data(_llm):
     with st.spinner(text="Loading and indexing the Streamlit docs – hang tight! This should take 1-2 minutes."):
         reader = SimpleDirectoryReader(
             input_files=["./db_docs/docs/eBook-How-to-Build-a-Career-in-AI.pdf"]
         )
         docs = reader.load_data()
 
-        service_context = ServiceContext.from_defaults(llm=_llm, embed_model=embed_model)#, system_prompt="You are an expert on the Streamlit Python library and your job is to answer technical questions. Assume that all questions are related to the Streamlit Python library. Keep your answers technical and based on facts – do not hallucinate features."))
+        service_context = ServiceContext.from_defaults(llm=_llm)#, system_prompt="You are an expert on the Streamlit Python library and your job is to answer technical questions. Assume that all questions are related to the Streamlit Python library. Keep your answers technical and based on facts – do not hallucinate features."))
         index = VectorStoreIndex.from_documents(docs, service_context=service_context)
         return index
 
@@ -39,7 +39,7 @@ if __name__ == "__main__":
             {"role": "assistant", "content": "Ask me a question about Streamlit's open-source Python library!"}
         ]
 
-    index = load_data(llm, embed_model)
+    index = load_data(llm)
 
     if "chat_engine" not in st.session_state.keys(): # Initialize the chat engine
             st.session_state.chat_engine = index.as_chat_engine(chat_mode="condense_question", verbose=True)
