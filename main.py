@@ -1,7 +1,8 @@
 import os
 from dotenv import load_dotenv
 import openai
-from llama_index import SimpleDirectoryReader, Document, download_loader
+from llama_index import SimpleDirectoryReader, Document#, download_loader
+from llama_hub.notion import NotionPageReader
 from llama_index import ServiceContext, VectorStoreIndex#, StorageContext, load_index_from_storage
 from llama_index.llms import OpenAI#, MistralAI
 #from llama_index.embeddings import MistralAIEmbedding
@@ -24,8 +25,7 @@ def load_documents():
     )
     documents = reader.load_data()
     """
-    NotionPageReader = download_loader('NotionPageReader')
-
+    #NotionPageReader = download_loader('NotionPageReader')
     page_ids = ["491ea0f6b03147bb8dbc78d5ba6d058d"]
     documents = NotionPageReader(integration_token=notion_token).load_data(
         page_ids=page_ids
