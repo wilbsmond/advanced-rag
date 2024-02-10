@@ -38,7 +38,7 @@ def join_documents(documents):
     return document
 
 def build_index(documents, llm_model, mode):
-    service_context = ServiceContext.from_defaults(llm_model)
+    service_context = ServiceContext.from_defaults(llm=llm_model)
     """
     save_dir = f"./db_index/{mode}_index"
     print(f"Save dir: {save_dir}")
@@ -61,9 +61,7 @@ def build_index(documents, llm_model, mode):
 def load_data_to_index(_llm_model, mode):
     with st.spinner(text="Loading and indexing the {} docs – hang tight! This should take a few minutes."):
         docs = load_documents()
-        #index = build_index(docs, _llm_model, mode)
-        service_context = ServiceContext.from_defaults(_llm_model)
-        index = VectorStoreIndex.from_documents(docs, service_context=service_context)
+        index = build_index(docs, _llm_model, mode)
         return index
 
 if __name__ == "__main__":
