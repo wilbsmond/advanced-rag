@@ -58,10 +58,10 @@ def build_index(documents, llm_model, mode):
     return index
 
 @st.cache_resource(show_spinner=False)
-def load_data_to_index(llm_model, mode):
+def load_data_to_index(_llm_model, mode):
     with st.spinner(text="Loading and indexing the {} docs – hang tight! This should take a few minutes."):
         docs = load_documents()
-        index = build_index(docs, llm_model, mode)
+        index = build_index(docs, _llm_model, mode)
         return index
 
 if __name__ == "__main__":
