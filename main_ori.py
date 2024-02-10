@@ -21,7 +21,7 @@ import os
 print(os.getcwd())
 
 def load_documents():
-    """
+    #"""
     reader = SimpleDirectoryReader(
         input_files=["./db_docs/docs/eBook-How-to-Build-a-Career-in-AI.pdf"]
     )
@@ -33,7 +33,7 @@ def load_documents():
     documents = NotionPageReader(integration_token=notion_token).load_data(
         page_ids=page_ids
     )
-    #"""
+    """
     return documents
 
 def join_documents(documents):
@@ -42,8 +42,7 @@ def join_documents(documents):
 
 def build_index(documents, mode):
     service_context = ServiceContext.from_defaults(llm=llm, embed_model=embed_model)
-
-    """ # only for local, otherwise deploy to streamlit causes issues
+    """
     save_dir = f"./db_index/{mode}_index"
     print(f"Save dir: {save_dir}")
 
@@ -63,7 +62,7 @@ def build_index(documents, mode):
 
 @st.cache_resource(show_spinner=False)
 def load_data_to_index(mode):
-    with st.spinner(text="Loading and indexing the Streamlit docs – hang tight! This should take 1-2 minutes."):
+    with st.spinner(text="Loading and indexing the {} docs – hang tight! This should take a few minutes."):
         docs = load_documents()
         index = build_index(docs, mode)
         return index

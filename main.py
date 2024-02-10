@@ -1,8 +1,8 @@
 import os
 from dotenv import load_dotenv
 import openai
-from llama_index import SimpleDirectoryReader, download_loader, Document
-from llama_index import ServiceContext, VectorStoreIndex, StorageContext, load_index_from_storage
+from llama_index import SimpleDirectoryReader, Document#, download_loader
+from llama_index import ServiceContext, VectorStoreIndex#, StorageContext, load_index_from_storage
 from llama_index.llms import OpenAI#, MistralAI
 #from llama_index.embeddings import MistralAIEmbedding
 #from trulens_eval import Tru
@@ -16,9 +16,6 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 notion_token = os.getenv('NOTION_INTEGRATION_TOKEN')
 #openai.api_key = st.secrets.OPENAI_API_KEY
-
-import os
-print(os.getcwd())
 
 def load_documents():
     #"""
