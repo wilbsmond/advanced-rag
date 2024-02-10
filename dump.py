@@ -1,4 +1,35 @@
 """
+def build_automerging_index(
+    documents,
+    llm,
+    embed_model="local:BAAI/bge-small-en-v1.5",
+    save_dir="merging_index",
+    chunk_sizes=None,
+):
+    chunk_sizes = chunk_sizes or [2048, 512, 128]
+    node_parser = HierarchicalNodeParser.from_defaults(chunk_sizes=chunk_sizes)
+    nodes = node_parser.get_nodes_from_documents(documents)
+    leaf_nodes = get_leaf_nodes(nodes)
+    merging_context = ServiceContext.from_defaults(
+        llm=llm,
+        embed_model=embed_model,
+    )
+    storage_context = StorageContext.from_defaults()
+    storage_context.docstore.add_documents(nodes)
+
+    if not os.path.exists(save_dir):
+        automerging_index = VectorStoreIndex(
+            leaf_nodes, storage_context=storage_context, service_context=merging_context
+        )
+        automerging_index.storage_context.persist(persist_dir=save_dir)
+    else:
+        automerging_index = load_index_from_storage(
+            StorageContext.from_defaults(persist_dir=save_dir),
+            service_context=merging_context,
+        )
+    return automerging_index
+"""
+"""
 def build_query_engine(llm, embed_model, mode, documents):
     if mode == "basic":
         query_engine = index.as_query_engine(similarity_top_k=2)

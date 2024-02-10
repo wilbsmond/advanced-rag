@@ -3,9 +3,10 @@ from dotenv import load_dotenv
 import openai
 from llama_index import SimpleDirectoryReader, Document#, download_loader
 from llama_hub.notion import NotionPageReader
-from llama_index import ServiceContext, VectorStoreIndex, StorageContext, load_index_from_storage
 from llama_index.llms import OpenAI#, MistralAI
 #from llama_index.embeddings import MistralAIEmbedding
+from llama_index import ServiceContext, VectorStoreIndex, StorageContext, load_index_from_storage
+from llama_index.node_parser import SentenceWindowNodeParser
 #from trulens_eval import Tru
 import streamlit as st
 """
@@ -20,9 +21,7 @@ notion_token = os.getenv('NOTION_INTEGRATION_TOKEN')
 
 def load_documents():
     """
-    reader = SimpleDirectoryReader(
-        input_files=["./db/docs/eBook-How-to-Build-a-Career-in-AI.pdf"]
-    )
+    reader = SimpleDirectoryReader(input_files=["./db/docs/eBook-How-to-Build-a-Career-in-AI.pdf"])
     documents = reader.load_data()
     """
     #NotionPageReader = download_loader('NotionPageReader')
@@ -37,44 +36,52 @@ def join_documents(documents):
     document = Document(text="\n\n".join([doc.text for doc in documents]))
     return document
 
-def build_index(documents, llm_model, mode):
-    service_context = ServiceContext.from_defaults(llm=llm_model)
-    #"""
-    save_dir = f"./db/index/{mode}_index"
-    print(f"Save dir: {save_dir}")
+def build_index(documents, llm, retrieval_mode):
+    if retrieval_mode == "basic":
+        context = ServiceContext.from_defaults(llm=llm)
 
-    if not os.path.exists(save_dir):
-        index = VectorStoreIndex.from_documents(
-            documents, service_context=service_context
+    elif retrieval_mode == "sentence_window":
+        sentence_window_size = 3
+        node_parser = SentenceWindowNodeParser.from_defaults(
+            window_size=sentence_window_size,
+            window_metadata_key="window",
+            original_text_metadata_key="original_text",
         )
+        context = ServiceContext.from_defaults(
+            llm=llm,
+            node_parser=node_parser,
+        )
+    
+    #"""
+    save_dir = f"./db/index/{retrieval_mode}_index"
+    if not os.path.exists(save_dir):
+        index = VectorStoreIndex.from_documents(documents, service_context=context)
         index.storage_context.persist(persist_dir=save_dir)
     else:
         index = load_index_from_storage(
             StorageContext.from_defaults(persist_dir=save_dir),
-            service_context=service_context,
+            service_context=context,
         )
     #"""
-    index = VectorStoreIndex.from_documents(documents, service_context=service_context)
     return index
 
 @st.cache_resource(show_spinner=False)
-def load_data_to_index(_llm_model, mode):
+def load_data_to_index(_llm, mode):
     with st.spinner(text="Loading and indexing the {} docs – hang tight! This should take a few minutes."):
         docs = load_documents()
-        index = build_index(docs, _llm_model, mode)
+        index = build_index(docs, _llm, mode)
         return index
 
-system_prompt = """
-                You are an expert on the Blendle's Employee Handbook and your job is to answer questions relating to its contents. 
-                Keep your answers based on facts – do not hallucinate features.
-                """
-
 if __name__ == "__main__":
-    llm_model = OpenAI(model="gpt-3.5-turbo", temperature=0.1, system_prompt=system_prompt)
+    llm = OpenAI(model="gpt-3.5-turbo", temperature=0.1, system_prompt=system_prompt)
     #llm = MistralAI(model="mistral-medium", api_key=os.getenv("MISTRAL_API_KEY"))
     #embed_model = "local:BAAI/bge-small-en-v1.5"
     #embed_model = MistralAIEmbedding(model_name="mistral-embed", api_key=os.getenv("MISTRAL_API_KEY"))
-    rag_mode = "basic"
+    retrieval_mode = "sentence_window"
+    system_prompt = """
+                    You are an expert on the Blendle's Employee Handbook and your job is to answer questions relating to its contents. 
+                    Keep your answers based on facts – do not hallucinate features.
+                    """
 
     ## Streamlit --------------------------------------
     #st.set_page_config(page_title="Chat with the Streamlit docs, powered by LlamaIndex", page_icon="🦙", layout="centered", initial_sidebar_state="auto", menu_items=None)
@@ -89,7 +96,7 @@ if __name__ == "__main__":
         ]
 
     # Load and index data
-    index = load_data_to_index(llm_model, rag_mode)
+    index = load_data_to_index(llm, retrieval_mode)
 
     # Create chat engine
     if "chat_engine" not in st.session_state.keys(): # Initialize the chat engine
