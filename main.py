@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import openai
 from llama_index import SimpleDirectoryReader, Document#, download_loader
 from llama_hub.notion import NotionPageReader
-from llama_index import ServiceContext, VectorStoreIndex#, StorageContext, load_index_from_storage
+from llama_index import ServiceContext, VectorStoreIndex, StorageContext, load_index_from_storage
 from llama_index.llms import OpenAI#, MistralAI
 #from llama_index.embeddings import MistralAIEmbedding
 #from trulens_eval import Tru
@@ -21,7 +21,7 @@ notion_token = os.getenv('NOTION_INTEGRATION_TOKEN')
 def load_documents():
     """
     reader = SimpleDirectoryReader(
-        input_files=["./db_docs/docs/eBook-How-to-Build-a-Career-in-AI.pdf"]
+        input_files=["./db/docs/eBook-How-to-Build-a-Career-in-AI.pdf"]
     )
     documents = reader.load_data()
     """
@@ -39,8 +39,8 @@ def join_documents(documents):
 
 def build_index(documents, llm_model, mode):
     service_context = ServiceContext.from_defaults(llm=llm_model)
-    """
-    save_dir = f"./db_index/{mode}_index"
+    #"""
+    save_dir = f"./db/index/{mode}_index"
     print(f"Save dir: {save_dir}")
 
     if not os.path.exists(save_dir):
@@ -53,7 +53,7 @@ def build_index(documents, llm_model, mode):
             StorageContext.from_defaults(persist_dir=save_dir),
             service_context=service_context,
         )
-    """
+    #"""
     index = VectorStoreIndex.from_documents(documents, service_context=service_context)
     return index
 
