@@ -15,20 +15,20 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 notion_token = os.getenv('NOTION_INTEGRATION_TOKEN')
 
 @st.cache_resource(show_spinner=False)
-def load_data(_llm):
+def load_data(llm):
     with st.spinner(text="Loading and indexing the Streamlit docs – hang tight! This should take 1-2 minutes."):
         reader = SimpleDirectoryReader(
             input_files=["./db_docs/docs/eBook-How-to-Build-a-Career-in-AI.pdf"]
         )
         docs = reader.load_data()
 
-        service_context = ServiceContext.from_defaults(llm=_llm)#, system_prompt="You are an expert on the Streamlit Python library and your job is to answer technical questions. Assume that all questions are related to the Streamlit Python library. Keep your answers technical and based on facts – do not hallucinate features."))
+        service_context = ServiceContext.from_defaults(llm=llm)#, system_prompt="You are an expert on the Streamlit Python library and your job is to answer technical questions. Assume that all questions are related to the Streamlit Python library. Keep your answers technical and based on facts – do not hallucinate features."))
         index = VectorStoreIndex.from_documents(docs, service_context=service_context)
         return index
 
 if __name__ == "__main__":
     llm = OpenAI(model="gpt-3.5-turbo", temperature=0.1)
-    embed_model = "local:BAAI/bge-small-en-v1.5"
+    #embed_model = "local:BAAI/bge-small-en-v1.5"
 
     st.set_page_config(page_title="Chat with the Streamlit docs, powered by LlamaIndex", page_icon="🦙", layout="centered", initial_sidebar_state="auto", menu_items=None)
     st.title("Chat with the Streamlit docs, powered by LlamaIndex 💬🦙")
