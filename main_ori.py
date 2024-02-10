@@ -58,15 +58,10 @@ def build_index(documents, mode):
     return index
 
 @st.cache_resource(show_spinner=False)
-def load_data_to_index():
+def load_data_to_index(mode):
     with st.spinner(text="Loading and indexing the {} docs – hang tight! This should take a few minutes."):
-        reader = SimpleDirectoryReader(
-            input_files=["./db_docs/docs/eBook-How-to-Build-a-Career-in-AI.pdf"]
-        )
-        documents = reader.load_data()
-        
-        service_context = ServiceContext.from_defaults(llm=OpenAI(model="gpt-3.5-turbo", temperature=0.5))#, system_prompt="You are an expert on the Streamlit Python library and your job is to answer technical questions. Assume that all questions are related to the Streamlit Python library. Keep your answers technical and based on facts – do not hallucinate features."))
-        index = VectorStoreIndex.from_documents(documents, service_context=service_context)
+        docs = load_documents()
+        index = build_index(docs, mode)
         return index
 
 if __name__ == "__main__":
@@ -89,7 +84,7 @@ if __name__ == "__main__":
         ]
 
     # Load and index data
-    index = load_data_to_index()
+    index = load_data_to_index(rag_mode)
 
     # Create chat engine
     if "chat_engine" not in st.session_state.keys(): # Initialize the chat engine

@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 import openai
-from llama_index import SimpleDirectoryReader, Document#, download_loader
+from llama_index import SimpleDirectoryReader, Document, download_loader
 from llama_index import ServiceContext, VectorStoreIndex#, StorageContext, load_index_from_storage
 from llama_index.llms import OpenAI#, MistralAI
 #from llama_index.embeddings import MistralAIEmbedding
@@ -18,7 +18,7 @@ notion_token = os.getenv('NOTION_INTEGRATION_TOKEN')
 #openai.api_key = st.secrets.OPENAI_API_KEY
 
 def load_documents():
-    #"""
+    """
     reader = SimpleDirectoryReader(
         input_files=["./db_docs/docs/eBook-How-to-Build-a-Career-in-AI.pdf"]
     )
@@ -30,7 +30,7 @@ def load_documents():
     documents = NotionPageReader(integration_token=notion_token).load_data(
         page_ids=page_ids
     )
-    """
+    #"""
     return documents
 
 def join_documents(documents):
