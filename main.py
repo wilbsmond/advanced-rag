@@ -84,7 +84,7 @@ if __name__ == "__main__":
         ]
 
     # Load and index data
-    index = load_data_to_index(rag_mode)
+    index = load_data_to_index(llm, rag_mode)
 
     # Create chat engine
     if "chat_engine" not in st.session_state.keys(): # Initialize the chat engine
