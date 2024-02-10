@@ -15,7 +15,7 @@ from utils.trulens_utils import trulens_recorder, run_evals
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 notion_token = os.getenv('NOTION_INTEGRATION_TOKEN')
-openai.api_key = st.secrets.OPENAI_API_KEY
+#openai.api_key = st.secrets.OPENAI_API_KEY
 
 import os
 print(os.getcwd())
@@ -43,7 +43,7 @@ def join_documents(documents):
 def build_index(documents, mode):
     service_context = ServiceContext.from_defaults(llm=llm, embed_model=embed_model)
 
-    """
+    """ # only for local, otherwise deploy to streamlit causes issues
     save_dir = f"./db_index/{mode}_index"
     print(f"Save dir: {save_dir}")
 
