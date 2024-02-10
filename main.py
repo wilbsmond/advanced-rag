@@ -37,8 +37,8 @@ def join_documents(documents):
     document = Document(text="\n\n".join([doc.text for doc in documents]))
     return document
 
-def build_index(documents, llm, mode):
-    service_context = ServiceContext.from_defaults(llm)
+def build_index(documents, llm_model, mode):
+    service_context = ServiceContext.from_defaults(llm_model)
     """
     save_dir = f"./db_index/{mode}_index"
     print(f"Save dir: {save_dir}")
@@ -58,14 +58,14 @@ def build_index(documents, llm, mode):
     return index
 
 @st.cache_resource(show_spinner=False)
-def load_data_to_index(_llm, mode):
+def load_data_to_index(llm_model, mode):
     with st.spinner(text="Loading and indexing the {} docs – hang tight! This should take a few minutes."):
         docs = load_documents()
-        index = build_index(docs, _llm, mode)
+        index = build_index(docs, llm_model, mode)
         return index
 
 if __name__ == "__main__":
-    llm = OpenAI(model="gpt-3.5-turbo", temperature=0.1)
+    llm_model = OpenAI(model="gpt-3.5-turbo", temperature=0.1)
     #llm = MistralAI(model="mistral-medium", api_key=os.getenv("MISTRAL_API_KEY"))
     #embed_model = "local:BAAI/bge-small-en-v1.5"
     #embed_model = MistralAIEmbedding(model_name="mistral-embed", api_key=os.getenv("MISTRAL_API_KEY"))
@@ -84,7 +84,7 @@ if __name__ == "__main__":
         ]
 
     # Load and index data
-    index = load_data_to_index(llm, rag_mode)
+    index = load_data_to_index(llm_model, rag_mode)
 
     # Create chat engine
     if "chat_engine" not in st.session_state.keys(): # Initialize the chat engine
