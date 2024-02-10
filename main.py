@@ -15,7 +15,7 @@ from utils.trulens_utils import trulens_recorder, run_evals
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 notion_token = os.getenv('NOTION_INTEGRATION_TOKEN')
-#openai.api_key = st.secrets.OPENAI_API_KEY
+openai.api_key = st.secrets.OPENAI_API_KEY
 
 import os
 print(os.getcwd())
@@ -42,6 +42,8 @@ def join_documents(documents):
 
 def build_index(documents, mode):
     service_context = ServiceContext.from_defaults(llm=llm, embed_model=embed_model)
+
+    """
     save_dir = f"./db_index/{mode}_index"
     print(f"Save dir: {save_dir}")
 
@@ -55,7 +57,8 @@ def build_index(documents, mode):
             StorageContext.from_defaults(persist_dir=save_dir),
             service_context=service_context,
         )
-    
+    """
+    index = VectorStoreIndex.from_documents(documents, service_context=service_context)
     return index
 
 @st.cache_resource(show_spinner=False)
@@ -74,7 +77,8 @@ if __name__ == "__main__":
 
     ## Streamlit --------------------------------------
     #st.set_page_config(page_title="Chat with the Streamlit docs, powered by LlamaIndex", page_icon="🦙", layout="centered", initial_sidebar_state="auto", menu_items=None)
-    st.title("Chat with [Blendle's Employee Handbook](https://yolospace.notion.site/Blendle-s-Employee-Handbook-e31bff7da17346ee99f531087d8b133f), powered by Advanced RAG and LlamaIndex 💬🦙")
+    st.title("Chat with [Blendle's Employee Handbook](https://yolospace.notion.site/Blendle-s-Employee-Handbook-e31bff7da17346ee99f531087d8b133f)")
+    st.info("Powered by Advanced RAG and LlamaIndex 💬🦙")
     #st.info("Check out the full tutorial to build this app in our [blog post](https://blog.streamlit.io/build-a-chatbot-with-custom-data-sources-powered-by-llamaindex/)", icon="📃")
 
     # Initialize message history
