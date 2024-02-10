@@ -4,6 +4,12 @@ from llama_index.llms import OpenAI
 import openai
 from llama_index import SimpleDirectoryReader
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
+notion_token = os.getenv('NOTION_INTEGRATION_TOKEN')
+
 @st.cache_resource(show_spinner=False)
 def load_data():
     with st.spinner(text="Loading and indexing the Streamlit docs – hang tight! This should take 1-2 minutes."):
@@ -16,10 +22,8 @@ def load_data():
         index = VectorStoreIndex.from_documents(docs, service_context=service_context)
         return index
 
-
 if __name__ == "__main__":
     st.set_page_config(page_title="Chat with the Streamlit docs, powered by LlamaIndex", page_icon="🦙", layout="centered", initial_sidebar_state="auto", menu_items=None)
-    openai.api_key = st.secrets.openai_key
     st.title("Chat with the Streamlit docs, powered by LlamaIndex 💬🦙")
     st.info("Check out the full tutorial to build this app in our [blog post](https://blog.streamlit.io/build-a-chatbot-with-custom-data-sources-powered-by-llamaindex/)", icon="📃")
             
