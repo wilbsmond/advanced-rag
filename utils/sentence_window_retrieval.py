@@ -8,12 +8,10 @@ from llama_index import load_index_from_storage
 import nest_asyncio
 nest_asyncio.apply()
 
-def build_sentence_window_index(
-    documents,
+def build_sentence_window_context(
     llm,
-    embed_model="local:BAAI/bge-small-en-v1.5",
+    #embed_model="local:BAAI/bge-small-en-v1.5",
     sentence_window_size=3,
-    save_dir="sentence_index",
 ):
     # create the sentence window node parser w/ default settings
     node_parser = SentenceWindowNodeParser.from_defaults(
@@ -23,21 +21,10 @@ def build_sentence_window_index(
     )
     sentence_context = ServiceContext.from_defaults(
         llm=llm,
-        embed_model=embed_model,
         node_parser=node_parser,
     )
-    if not os.path.exists(save_dir):
-        sentence_index = VectorStoreIndex.from_documents(
-            documents, service_context=sentence_context
-        )
-        sentence_index.storage_context.persist(persist_dir=save_dir)
-    else:
-        sentence_index = load_index_from_storage(
-            StorageContext.from_defaults(persist_dir=save_dir),
-            service_context=sentence_context,
-        )
 
-    return sentence_index
+    return sentence_context
 
 
 def get_sentence_window_query_engine(

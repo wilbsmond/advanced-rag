@@ -9,11 +9,11 @@ from llama_index import ServiceContext, VectorStoreIndex, StorageContext, load_i
 from llama_index.node_parser import SentenceWindowNodeParser
 #from trulens_eval import Tru
 import streamlit as st
-"""
-from utils.sentence_window_retrieval import build_sentence_window_index, get_sentence_window_query_engine
-from utils.auto_merging_retrieval import build_automerging_index, get_automerging_query_engine
-from utils.trulens_utils import trulens_recorder, run_evals
-"""
+
+from utils.sentence_window_retrieval import build_sentence_window_context
+#from utils.auto_merging_retrieval import build_automerging_index, get_automerging_query_engine
+#from utils.trulens_utils import trulens_recorder, run_evals
+
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 notion_token = os.getenv('NOTION_INTEGRATION_TOKEN')
@@ -41,6 +41,8 @@ def build_retrieval(llm, retrieval_mode):
         context = ServiceContext.from_defaults(llm=llm)
 
     elif retrieval_mode == "sentence_window":
+        context = build_sentence_window_context(llm, sentence_window_size=3)
+        """
         sentence_window_size = 3
         node_parser = SentenceWindowNodeParser.from_defaults(
             window_size=sentence_window_size,
@@ -51,6 +53,7 @@ def build_retrieval(llm, retrieval_mode):
             llm=llm,
             node_parser=node_parser,
         )
+        """
     return context
 
 def build_index(documents, retrieval_context, retrieval_mode):
