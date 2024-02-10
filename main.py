@@ -61,7 +61,9 @@ def build_index(documents, llm_model, mode):
 def load_data_to_index(_llm_model, mode):
     with st.spinner(text="Loading and indexing the {} docs – hang tight! This should take a few minutes."):
         docs = load_documents()
-        index = build_index(docs, _llm_model, mode)
+        #index = build_index(docs, _llm_model, mode)
+        service_context = ServiceContext.from_defaults(_llm_model)
+        index = VectorStoreIndex.from_documents(docs, service_context=service_context)
         return index
 
 if __name__ == "__main__":
