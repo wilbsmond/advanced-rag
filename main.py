@@ -42,7 +42,7 @@ def join_documents(documents):
 
 def build_index(documents, mode):
     service_context = ServiceContext.from_defaults(llm=llm, embed_model=embed_model)
-
+    """
     save_dir = f"./db_index/{mode}_index"
     print(f"Save dir: {save_dir}")
 
@@ -56,12 +56,13 @@ def build_index(documents, mode):
             StorageContext.from_defaults(persist_dir=save_dir),
             service_context=service_context,
         )
+    """
     index = VectorStoreIndex.from_documents(documents, service_context=service_context)
     return index
 
 @st.cache_resource(show_spinner=False)
 def load_data_to_index(mode):
-    with st.spinner(text="Loading and indexing the Streamlit docs – hang tight! This should take 1-2 minutes."):
+    with st.spinner(text="Loading and indexing the {} docs – hang tight! This should take a few minutes."):
         docs = load_documents()
         index = build_index(docs, mode)
         return index
