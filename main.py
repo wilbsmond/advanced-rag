@@ -36,7 +36,7 @@ def join_documents(documents):
     document = Document(text="\n\n".join([doc.text for doc in documents]))
     return document
 
-def build_index(documents, llm, retrieval_mode):
+def build_retrieval(llm, retrieval_mode):
     if retrieval_mode == "basic":
         context = ServiceContext.from_defaults(llm=llm)
 
@@ -51,37 +51,40 @@ def build_index(documents, llm, retrieval_mode):
             llm=llm,
             node_parser=node_parser,
         )
-    
-    #"""
+    return context
+
+def build_index(documents, retrieval_context, retrieval_mode):
     save_dir = f"./db/index/{retrieval_mode}_index"
     if not os.path.exists(save_dir):
-        index = VectorStoreIndex.from_documents(documents, service_context=context)
+        index = VectorStoreIndex.from_documents(documents, service_context=retrieval_context)
         index.storage_context.persist(persist_dir=save_dir)
     else:
         index = load_index_from_storage(
             StorageContext.from_defaults(persist_dir=save_dir),
-            service_context=context,
+            service_context=retrieval_context,
         )
-    #"""
+
     return index
 
 @st.cache_resource(show_spinner=False)
-def load_data_to_index(_llm, mode):
+def load_data_to_index(_llm, retrieval_mode):
     with st.spinner(text="Loading and indexing the {} docs – hang tight! This should take a few minutes."):
-        docs = load_documents()
-        index = build_index(docs, _llm, mode)
+        documents = load_documents()
+        retrieval_context = build_retrieval(_llm, retrieval_mode)
+        index = build_index(documents, retrieval_context, retrieval_mode)
         return index
 
 if __name__ == "__main__":
+    system_prompt = """
+                You are an expert on the Blendle's Employee Handbook and your job is to answer questions relating to its contents. 
+                Keep your answers based on facts – do not hallucinate features.
+                """
     llm = OpenAI(model="gpt-3.5-turbo", temperature=0.1, system_prompt=system_prompt)
     #llm = MistralAI(model="mistral-medium", api_key=os.getenv("MISTRAL_API_KEY"))
     #embed_model = "local:BAAI/bge-small-en-v1.5"
     #embed_model = MistralAIEmbedding(model_name="mistral-embed", api_key=os.getenv("MISTRAL_API_KEY"))
     retrieval_mode = "sentence_window"
-    system_prompt = """
-                    You are an expert on the Blendle's Employee Handbook and your job is to answer questions relating to its contents. 
-                    Keep your answers based on facts – do not hallucinate features.
-                    """
+
 
     ## Streamlit --------------------------------------
     #st.set_page_config(page_title="Chat with the Streamlit docs, powered by LlamaIndex", page_icon="🦙", layout="centered", initial_sidebar_state="auto", menu_items=None)
