@@ -1,5 +1,5 @@
 llama-index==0.9.8
-llama-hub
+#llama-hub
 pypdf==3.16.1
 trulens-eval==0.21.0 
 sentence-transformers==2.2.2
